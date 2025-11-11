@@ -1,7 +1,6 @@
 import { type FC, useRef, useCallback, useState } from 'react'
-import Swal, { type SweetAlertIcon } from 'sweetalert2'
-import withReactContent from 'sweetalert2-react-content'
 import type { PreviewImage } from '@/configs/interfaces'
+import { createAlert } from '@/utils/createAlert'
 
 export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ value, onChange }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
@@ -9,17 +8,8 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
   const BYTES_SIZE: number = 1024
   const MAX_FILE_SIZE: number = 5 * BYTES_SIZE * BYTES_SIZE
   const i = Math.floor(Math.log(MAX_FILE_SIZE) / Math.log(BYTES_SIZE))
-  const sizeMegabytes: number | string = parseFloat((MAX_FILE_SIZE / Math.pow(BYTES_SIZE, i)).toFixed(0))
+  const sizeMegabytes: number | string = parseFloat((MAX_FILE_SIZE / Math.pow(BYTES_SIZE, i)).toFixed(2))
   const placeholderText = 'Tip: Write or drag image here (max 5 MB)'
-
-  const createAlert = (title: string, text: string, icon?: SweetAlertIcon): void => {
-    withReactContent(Swal).fire({
-      title,
-      text,
-      icon,
-      theme: 'auto'
-    })
-  }
 
   const insertAtCurrentPosition = useCallback((text: string) => {
       const textArea = textareaRef.current
@@ -69,7 +59,7 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
       if (!file.type.startsWith('image/')) {
         continue
       }
-      if (file.size > MAX_FILE_SIZE - 1) {
+      if (file.size > MAX_FILE_SIZE) {
         createAlert('Warning', `${file.name} exceeds maximum file limit of ${sizeMegabytes} MB`, 'warning')
         continue
       }

@@ -1,6 +1,6 @@
 import { useRef } from 'react'
 import { useNotes } from '@/hooks/useNotes'
-import { Editor, Preview, Toolbar } from '@/components/index'
+import { Editor, Preview, Toolbar, StorageLimitProgress } from '@/components/index'
 
 export default function App() {
     const { text, setText } = useNotes()
@@ -15,6 +15,7 @@ export default function App() {
             <main className="flex flex-1 overflow-hidden">
                 <div className="w-1/2 h-full border-r p-4 justify-center items-center overflow-scroll">
                     <Editor value={text} onChange={setText} />
+                    <StorageLimitProgress current={text} />
                 </div>
                 <div className="w-1/2 h-full p-4 flex justify-center items-center">
                     <div ref={previewRef} className="w-full h-full max-w-2xl bg-white rounded-lg shadow-md overflow-hidden" >
