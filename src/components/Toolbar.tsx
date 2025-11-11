@@ -11,9 +11,17 @@ export const Toolbar: FC<{ onReset: () => void, previewRef: React.RefObject<HTML
 
         const canvas = await html2canvas(previewRef.current)
         const imgData = canvas.toDataURL('image/png')
-        const pdf = new jsPDF()
-        pdf.addImage(imgData, 'PNG', 0, 0, 1000, 1000)
-        pdf.save('note.pdf')
+        let document: jsPDF;
+
+        if (canvas.width > canvas.height) {
+            document = new jsPDF('l', 'mm', [canvas.width, canvas.height]);
+        }
+        else {
+            document = new jsPDF('p', 'mm', [canvas.height, canvas.width]);
+        }
+
+        document.addImage(imgData, 'png', 10, 10, canvas.width, canvas.height)
+        document.save('notes.pdf')
     }
 
     return (
