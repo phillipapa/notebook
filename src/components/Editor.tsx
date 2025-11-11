@@ -36,15 +36,9 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
 
   const handleDrop = (e: React.DragEvent<HTMLTextAreaElement>) => {
     e.preventDefault()
-    const file = e.dataTransfer.files[0]
-    if (file && file.type.startsWith('image/')) {
-      const reader = new FileReader()
-      reader.onload = () => {
-        const dataUrl = reader.result as string
-        const altName = file.name
-        insertAtCurrentPosition(`![${altName}](${dataUrl})`)
-      }
-      reader.readAsDataURL(file)
+    const files = Array.from(e.dataTransfer.files ?? [])
+    if (files.length) {
+      processImage(files)
     }
   }
 
@@ -63,8 +57,10 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
   }
 
   const [previewList, setPreviewList] = useState<PreviewImage[]>([])
-  const MAX_SIZE = 10 * 1024 * 1024
-  const sizeMegabytes = Math.floor(Math.log(MAX_SIZE) / Math.log(1024));
+  const BYTES_SIZE: number = 1024
+  const MAX_SIZE_BYTES: number = 5 * BYTES_SIZE * BYTES_SIZE
+  const i = Math.floor(Math.log(MAX_SIZE_BYTES) / Math.log(BYTES_SIZE))
+  const sizeMegabytes: number | string = parseFloat((MAX_SIZE_BYTES / Math.pow(BYTES_SIZE, i)).toFixed(0))
 
   const processImage = (files: File[]) => {
     const previews: PreviewImage[] = []
@@ -73,7 +69,7 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
       if (!file.type.startsWith('image/')) {
         continue
       }
-      if (file.size > MAX_SIZE) {
+      if (file.size > MAX_SIZE_BYTES - 1) {
         createAlert('Warning', `${file.name} exceeds maximum file limit of ${sizeMegabytes} MB`, 'warning')
         continue
       }
@@ -98,15 +94,30 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
   const cancelInsert = () => setPreviewList([])
 
   return (
-    <textarea
-      ref={textareaRef}
-      className="w-full h-full p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
-      value={value}
-      onChange={(e) => onChange(e.target.value)}
-      onDrop={handleDrop}
-      onDragOver={(e) => e.preventDefault()}
-      onDoubleClick={handleDoubleClick}
-      placeholder="Double click or drag to add image (max 10 MB)"
-    />
+    <div className="relative h-full">
+      <textarea
+        ref={textareaRef}
+        className="w-full h-full p-4 border rounded-md focus:outline-none focus:ring-2 focus:ring-gray-300"
+        value={value}
+        onChange={(e) => onChange(e.target.value)}
+        onDrop={handleDrop}
+        onDragOver={(e) => e.preventDefault()}
+        onDoubleClick={handleDoubleClick}
+        placeholder="Write here…"
+        aria-label="Double click to insert image"
+      />
+
+      {previewList.length > 0 && (
+        <div className="absolute inset-0 bg-black bg-opacity-50 flex items-center justify-center" role="dialog" aria-modal="true" aria-label="Image preview">
+          <div className="bg-white rounded p-4 max-w-xs w-full">
+            <img src={previewList[0].url} alt={previewList[0].file.name} className="w-full h-auto mb-4 rounded"/>
+            <div className="flex justify-end space-x-2">
+              <button onClick={cancelInsert} className="px-3 py-1 bg-yellow-300 rounded">Cancel</button>
+              <button onClick={() => confirmInsert(previewList[0])} className="px-3 py-1 bg-green-300 rounded"> Insert</button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
   )
 }
