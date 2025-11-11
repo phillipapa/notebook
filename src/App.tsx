@@ -8,12 +8,12 @@ export default function App() {
 
     return (
         <div className="h-screen flex flex-col">
-            <header className="p-4 bg-blue-400 text-white flex justify-between items-center">
-                <h1 className="text-xl font-semibold">Notebook</h1>
+            <header className="p-4 bg-green-400 text-black flex justify-between items-center">
+                <h1 className="text-xl font-bold">Notebook</h1>
                 <Toolbar onReset={() => setText('')} previewRef={previewRef as React.RefObject<HTMLDivElement>} />
             </header>
             <main className="flex flex-1 overflow-hidden">
-                <div className="w-1/2 h-full border-r">
+                <div className="w-1/2 h-full border-r p-4 justify-center items-center overflow-scroll">
                     <Editor value={text} onChange={setText} />
                 </div>
                 <div className="w-1/2 h-full p-4 flex justify-center items-center">

@@ -18,8 +18,8 @@ export const Toolbar: FC<{ onReset: () => void, previewRef: React.RefObject<HTML
 
     return (
         <div className="flex space-x-2">
-            <button className="px-3 py-1 bg-blue-300 text-white rounded" onClick={exportPDF}> Export PDF </button>
-            <button className="px-3 py-1 bg-gray-400 text-white rounded" onClick={onReset}> Reset </button>
+            <button className="px-3 py-1 bg-blue-400 text-black rounded font-semibold" onClick={exportPDF}> Export as PDF </button>
+            <button className="px-3 py-1 bg-red-400 text-black rounded font-semibold" onClick={onReset}> Reset </button>
         </div>
     )
 }
