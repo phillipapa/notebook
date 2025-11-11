@@ -5,6 +5,12 @@ import type { PreviewImage } from '@/interfaces'
 
 export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ value, onChange }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+  const [previewList, setPreviewList] = useState<PreviewImage[]>([])
+  const BYTES_SIZE: number = 1024
+  const MAX_SIZE_BYTES: number = 5 * BYTES_SIZE * BYTES_SIZE
+  const i = Math.floor(Math.log(MAX_SIZE_BYTES) / Math.log(BYTES_SIZE))
+  const sizeMegabytes: number | string = parseFloat((MAX_SIZE_BYTES / Math.pow(BYTES_SIZE, i)).toFixed(0))
+  const placeholderText = 'Tip: Write or drag image here (max 5 MB)'
 
   const createAlert = (title: string, text: string, icon?: SweetAlertIcon): void => {
     withReactContent(Swal).fire({
@@ -56,12 +62,6 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
     input.click()
   }
 
-  const [previewList, setPreviewList] = useState<PreviewImage[]>([])
-  const BYTES_SIZE: number = 1024
-  const MAX_SIZE_BYTES: number = 5 * BYTES_SIZE * BYTES_SIZE
-  const i = Math.floor(Math.log(MAX_SIZE_BYTES) / Math.log(BYTES_SIZE))
-  const sizeMegabytes: number | string = parseFloat((MAX_SIZE_BYTES / Math.pow(BYTES_SIZE, i)).toFixed(0))
-
   const processImage = (files: File[]) => {
     const previews: PreviewImage[] = []
 
@@ -103,7 +103,7 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
         onDrop={handleDrop}
         onDragOver={(e) => e.preventDefault()}
         onDoubleClick={handleDoubleClick}
-        placeholder="Write here…"
+        placeholder={placeholderText}
         aria-label="Double click to insert image"
       />
 
