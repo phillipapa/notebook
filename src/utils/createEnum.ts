@@ -1,6 +1,6 @@
 type Branded<T, Brand extends string> = T & { __brand: Brand };
 
-const createEnumsNumberValue = <const T extends Record<string, number>>(obj: T, brand : string) => {
+const createEnumNumberValue = <const T extends Record<string, number>>(obj: T, brand : string) => {
     return Object.fromEntries(
         Object.entries(obj).map(([k, v]) => [
             k, v as Branded<typeof v, typeof brand>,
@@ -10,7 +10,7 @@ const createEnumsNumberValue = <const T extends Record<string, number>>(obj: T, 
     };
 }
 
-const createEnumsStringValue = <const T extends Record<string, number>>(obj: T, brand : string) => {
+const createEnumStringValue = <const T extends Record<string, string>>(obj: T, brand : string) => {
     return Object.fromEntries(
         Object.entries(obj).map(([k, v]) => [
             k, v as Branded<typeof v, typeof brand>,
@@ -20,9 +20,9 @@ const createEnumsStringValue = <const T extends Record<string, number>>(obj: T, 
     };
 }
 
-const funcs = {
-    createEnumsNumberValue,
-    createEnumsStringValue
+const createEnumFunctions = {
+    createEnumNumberValue,
+    createEnumStringValue
 }
 
-export default funcs
+export default createEnumFunctions
