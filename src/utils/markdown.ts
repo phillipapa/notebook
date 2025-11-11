@@ -1,5 +1,5 @@
 import { marked } from 'marked'
 
-export async function parseMarkdown(md: string): Promise<string> {
-    return marked(md)
+export async function parseMarkdown(markdown: string): Promise<string> {
+    return marked(markdown)
 }
