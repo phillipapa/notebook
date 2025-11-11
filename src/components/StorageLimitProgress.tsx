@@ -13,7 +13,7 @@ export const StorageLimitProgress: FC<{ current: string }> = ({ current }) => {
             <div className="text-sm text-gray-600 mb-1">Usage:</div>
             <div className="relative w-full bg-gray-200 rounded h-2">
                 <div className={`h-full rounded transition-all duration-200 ${ percent < 80 ? 'bg-green-500' : percent < 95 ? 'bg-yellow-500' : 'bg-red-500' }`} style={{ width: `${percent}%` }}>
-                    <span className="absolute inset-0 flex items-center justify-center text-xs text-white font-mono">
+                    <span className="absolute inset-0 flex items-center justify-center text-xs text-black font-mono">
                         {used} / {total} MB
                     </span>
                 </div>
