@@ -5,7 +5,7 @@ import html2canvas from 'html2canvas'
 export const Toolbar: FC<{ onReset: () => void, previewRef: React.RefObject<HTMLDivElement> }> = ({ onReset, previewRef }) => {
     const exportPDF = async () => {
 
-        if (!previewRef.current) {
+        if (!previewRef || !previewRef.current) {
             return
         }
 

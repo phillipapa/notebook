@@ -12,7 +12,7 @@ export default function App() {
                 <h1 className="text-xl font-semibold">Markdown Notebook</h1>
                 <Toolbar
                     onReset={() => setText('')}
-                    previewRef={previewRef}
+                    previewRef={previewRef as React.RefObject<HTMLDivElement>}
                 />
             </header>
 
