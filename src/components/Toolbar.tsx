@@ -2,10 +2,10 @@ import type { FC } from 'react'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
 
-export const Toolbar: FC<{ onReset: () => void, previewRef: React.RefObject<HTMLDivElement> | null }> = ({ onReset, previewRef }) => {
+export const Toolbar: FC<{ onReset: () => void, previewRef: React.RefObject<HTMLDivElement> }> = ({ onReset, previewRef }) => {
     const exportPDF = async () => {
 
-        if (!previewRef) {
+        if (!previewRef.current) {
             return
         }
 
