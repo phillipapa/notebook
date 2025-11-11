@@ -8,7 +8,7 @@ export default function App() {
 
     return (
         <div className="h-screen flex flex-col">
-            <header className="p-4 bg-green-400 text-black flex justify-between items-center">
+            <header className="p-4 bg-gray-400 text-black flex justify-between items-center">
                 <h1 className="text-xl font-bold">Notebook</h1>
                 <Toolbar onReset={() => setText('')} previewRef={previewRef as React.RefObject<HTMLDivElement>} />
             </header>
