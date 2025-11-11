@@ -1,7 +1,19 @@
-import { type FC, useRef, useCallback } from 'react'
+import { type FC, useRef, useCallback, useState } from 'react'
+import Swal, { type SweetAlertIcon } from 'sweetalert2'
+import withReactContent from 'sweetalert2-react-content'
+import type { PreviewImage } from '@/interfaces'
 
 export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ value, onChange }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
+
+  const createAlert = (title: string, text: string, icon?: SweetAlertIcon): void => {
+    withReactContent(Swal).fire({
+      title,
+      text,
+      icon,
+      theme: 'auto'
+    })
+  }
 
   const insertAtCurrentPosition = useCallback((text: string) => {
       const textArea = textareaRef.current
@@ -40,21 +52,50 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
     const input = document.createElement('input')
     input.type = 'file'
     input.accept = 'image/*'
+    input.multiple = true
     input.onchange = () => {
-      const file = input.files?.[0]
-      if (!file) {
-        return
+      const files = Array.from(input.files ?? [])
+      if (files.length) {
+        processImage(files)
       }
-      const reader = new FileReader()
-      reader.onload = () => {
-        const dataUrl = reader.result as string
-        const altName = file.name
-        insertAtCurrentPosition(`![${altName}](${dataUrl})`)
-      }
-      reader.readAsDataURL(file)
     }
     input.click()
   }
+
+  const [previewList, setPreviewList] = useState<PreviewImage[]>([])
+  const MAX_SIZE = 10 * 1024 * 1024
+  const sizeMegabytes = Math.floor(Math.log(MAX_SIZE) / Math.log(1024));
+
+  const processImage = (files: File[]) => {
+    const previews: PreviewImage[] = []
+
+    for (const file of files) {
+      if (!file.type.startsWith('image/')) {
+        continue
+      }
+      if (file.size > MAX_SIZE) {
+        createAlert('Warning', `${file.name} exceeds maximum file limit of ${sizeMegabytes} MB`, 'warning')
+        continue
+      }
+
+      const reader = new FileReader()
+      reader.onload = () => {
+        previews.push({ file, url: reader.result as string })
+        if (previews.length === files.length) {
+          setPreviewList(previews)
+        }
+      }
+      reader.readAsDataURL(file)
+    }
+  }
+
+  const confirmInsert = (preview: PreviewImage) => {
+    const altName = preview.file.name
+    insertAtCurrentPosition(`![${altName}](${preview.url})`)
+    setPreviewList((queue) => queue.filter((p) => p !== preview))
+  }
+
+  const cancelInsert = () => setPreviewList([])
 
   return (
     <textarea
@@ -65,7 +106,7 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
       onDrop={handleDrop}
       onDragOver={(e) => e.preventDefault()}
       onDoubleClick={handleDoubleClick}
-      placeholder="TIP: Double click or drag to add image..."
+      placeholder="Double click or drag to add image (max 10 MB)"
     />
   )
 }
