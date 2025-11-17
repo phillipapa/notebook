@@ -2,7 +2,7 @@ import { Link } from 'react-router-dom';
 import { useState } from 'react';
 import { type FC } from 'react'
 
-export const HamburgerMenu: FC<{}> = ({}) => {
+export const Header: FC<{}> = ({}) => {
     const [open, setOpen] = useState(false);
 
     return (
@@ -15,7 +15,7 @@ export const HamburgerMenu: FC<{}> = ({}) => {
                     </div>
                     <div className="hidden md:block">
                         <div className="ml-10 flex items-baseline space-x-4">
-                            <Link to="/home" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-500">Home</Link>
+                            <Link to="/home" className="px-3 py-2 rouinkd-md text-sm font-medium hover:bg-gray-500">Home</Link>
                             <Link to="/about" className="px-3 py-2 rounded-md text-sm font-medium hover:bg-gray-500">About</Link>
                         </div>
                     </div>

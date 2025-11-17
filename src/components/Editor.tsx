@@ -1,4 +1,4 @@
-import { type FC, useRef, useCallback, useState } from 'react'
+import { type FC, useRef, useCallback, useState, useEffect } from 'react'
 import type { PreviewImage } from '@/configs/interfaces'
 import { createAlert } from '@/utils/createAlert'
 
@@ -9,7 +9,17 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
   const MAX_FILE_SIZE: number = 5 * BYTES_SIZE * BYTES_SIZE
   const i = Math.floor(Math.log(MAX_FILE_SIZE) / Math.log(BYTES_SIZE))
   const sizeMegabytes: number | string = parseFloat((MAX_FILE_SIZE / Math.pow(BYTES_SIZE, i)).toFixed(2))
-  const placeholderText = 'Tip: Write or drag image here (max 5 MB)'
+  const placeholderText: string = 'Tip: Write or drag image here (max 5 MB)'
+  const minRows: number = 5
+
+  const autoResizeTextarea = () => {
+    const textArea = textareaRef.current;
+    if (!textArea) {
+      return
+    };
+    textArea.style.height = "auto";
+    textArea.style.height = `${textArea.scrollHeight}px`;
+  };
 
   const insertAtCurrentPosition = useCallback((text: string) => {
       const textArea = textareaRef.current
@@ -83,6 +93,10 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
 
   const cancelInsert = () => setPreviewList([])
 
+  useEffect(() => {
+    autoResizeTextarea();
+  }, [value]);
+
   return (
     <div className="relative h-full">
       <textarea
@@ -95,6 +109,8 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
         onDoubleClick={handleDoubleClick}
         placeholder={placeholderText}
         aria-label="Double click to insert image"
+        rows={minRows}
+        style={{ maxHeight: "calc(100vh - 12rem)" }}
       />
 
       {previewList.length > 0 && (
