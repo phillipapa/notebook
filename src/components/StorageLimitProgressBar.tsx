@@ -3,13 +3,14 @@ import { getLocalStorageSize } from '@/utils/storage'
 
 export const StorageLimitProgressBar: FC<{ current: string }> = ({ current }) => {
     const MAX_FILE_SIZE = 5 * 1024 * 1024
-    const [size, setSize] = useState(getLocalStorageSize('notebook', current));
-    const percent = Math.min((size / (5 * 1024 * 1024)) * 100, 100)
-    const used = (size / 1024 / 1024).toFixed(2)
+    const size = getLocalStorageSize('notebook', current);
+    const percent = Math.min((size / MAX_FILE_SIZE) * 100, 100)
     const total = (MAX_FILE_SIZE / 1024 / 1024).toFixed(2)
+    const [usage, setUsage] = useState(0);
+    const used = (usage / 1024 / 1024).toFixed(2)
 
     useEffect(() => {
-        const update = () => { setSize(size); }
+        const update = () => { setUsage(size); }
         update()
         window.addEventListener("storage", update);
         return () => window.removeEventListener("storage", update);
