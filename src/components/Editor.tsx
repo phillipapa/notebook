@@ -5,12 +5,15 @@ import { createAlert } from '@/utils/createAlert'
 export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ value, onChange }) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [previewList, setPreviewList] = useState<PreviewImage[]>([])
+
+  const BASE64_BLOAT: number = 1.37 // base64 1.37x bigger
   const BYTES_SIZE: number = 1024
-  const MAX_FILE_SIZE: number = 5 * BYTES_SIZE * BYTES_SIZE
-  const i = Math.floor(Math.log(MAX_FILE_SIZE) / Math.log(BYTES_SIZE))
-  const sizeMegabytes: number | string = parseFloat((MAX_FILE_SIZE / Math.pow(BYTES_SIZE, i)).toFixed(2))
-  const actualAllowedImageSize: string = (MAX_FILE_SIZE / Math.pow(BYTES_SIZE, i) / 1.37).toFixed(1) // base64 1.37x bigger
-  const placeholderText: string = `Tip: Write or drag image here (max ${actualAllowedImageSize} MB)`
+  const MAX_LOCALSTORAGE_LIMIT: number = 5 * BYTES_SIZE * BYTES_SIZE // max LS browser = 5 MB
+  const MAX_IMAGE_SIZE = MAX_LOCALSTORAGE_LIMIT / BASE64_BLOAT
+  const i = Math.floor(Math.log(MAX_LOCALSTORAGE_LIMIT) / Math.log(BYTES_SIZE))
+  const actualAllowedImageSize: number = (Math.floor((MAX_LOCALSTORAGE_LIMIT / Math.pow(BYTES_SIZE, i) / BASE64_BLOAT) * 10) / 10)
+
+  const placeholderText: string = `Tip: Write or drag/double click to add image (max ${actualAllowedImageSize} MB)`
   const minRows: number = 5
 
   const autoResizeTextarea = () => {
@@ -70,8 +73,8 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
       if (!file.type.startsWith('image/')) {
         continue
       }
-      if (file.size > MAX_FILE_SIZE) {
-        createAlert('Warning', `${file.name} exceeds maximum file limit of ${sizeMegabytes} MB`, 'warning')
+      if (file.size > MAX_IMAGE_SIZE) {
+        createAlert('Warning', `${file.name} exceeds maximum file limit of ${actualAllowedImageSize} MB`, 'warning')
         continue
       }
 
