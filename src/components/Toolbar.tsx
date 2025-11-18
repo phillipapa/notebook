@@ -1,9 +1,10 @@
-import type { FC } from 'react'
+import { type FC, useState } from 'react'
 import { jsPDF } from 'jspdf'
 import html2canvas from 'html2canvas'
-import { createAlert } from '@/utils/createAlert'
+import { SaveButton, SignInMenu } from './index';
 
-export const Toolbar: FC<{ onReset: () => void, previewRef: React.RefObject<HTMLDivElement>, token: string, noteContent: string }> = ({ onReset, previewRef, token, noteContent }) => {
+export const Toolbar: FC<{ onReset: () => void, previewRef: React.RefObject<HTMLDivElement>, noteContent: string }> = ({ onReset, previewRef, noteContent }) => {
+    const [token, setToken] = useState<string | null>(null);
     const exportPDF = async () => {
 
         if (!previewRef || !previewRef.current) {
@@ -25,21 +26,12 @@ export const Toolbar: FC<{ onReset: () => void, previewRef: React.RefObject<HTML
         document.save('notes.pdf')
     }
 
-    const saveNotes = async () => {
-        const res = await fetch('/api/notes', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
-            body: JSON.stringify({ content: noteContent }),
-        });
-        const data = await res.json();
-        createAlert('Information', `Note saved with file ID: ${data.fileId}`, 'info')
-    }
-
     return (
         <div className="flex space-x-2">
-            <button className="px-3 py-1 bg-green-400 text-black rounded font-semibold" onClick={saveNotes}> Save to Drive </button>
+            <SignInMenu onLogin={(t) => setToken(t)} onLogout={() => setToken(null)} />
             <button className="px-3 py-1 bg-blue-400 text-black rounded font-semibold" onClick={exportPDF}> Export as PDF </button>
             <button className="px-3 py-1 bg-red-400 text-black rounded font-semibold" onClick={onReset}> Reset </button>
+            {token && <SaveButton token={token} noteContent={noteContent} />}
         </div>
     )
 }

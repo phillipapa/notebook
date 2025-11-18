@@ -1,9 +1,10 @@
 import { useGoogleLogin } from '@react-oauth/google';
-import { type FC, useState } from 'react';
+import { type JSX, useState } from 'react';
 import { createAlert } from '@/utils/createAlert';
+import type { LoginState } from '@/configs/interfaces';
 
-export const SignInMenu: FC<{}> = ({}) => {
-    const [user, setUser] = useState<{name:string; email:string; token:string} | null>(null);
+export const SignInMenu = ({ onLogin, onLogout }: LoginState): JSX.Element => {
+    const [user, setUser] = useState<{ name: string; email: string; } | null>(null);
 
     const login = () => useGoogleLogin({
         onSuccess: async (tokenResponse) => {
@@ -13,13 +14,21 @@ export const SignInMenu: FC<{}> = ({}) => {
                 body: JSON.stringify(tokenResponse),
             });
             const data = await res.json();
-            setUser({ name: data.name, email: data.email, token: tokenResponse.access_token! });
+            setUser({ name: data.name, email: data.email });
+            if (onLogin) {
+                onLogin(tokenResponse.access_token!)
+            }
         },
         onError: () => createAlert('Error', 'Login Failed, please try again', 'error'),
         scope: 'https://www.googleapis.com/auth/drive.file',
     });
 
-    const logout = () => setUser(null);
+    const logout = () => {
+        setUser(null);
+        if (onLogout) {
+            onLogout()
+        }
+    }
 
     return (
         <div className="flex items-center space-x-4">

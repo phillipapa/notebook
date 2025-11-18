@@ -21,7 +21,6 @@ export default function App() {
                     <Toolbar
                         onReset={() => setText('')}
                         previewRef={previewRef as React.RefObject<HTMLDivElement>}
-                        token=''
                         noteContent={text}
                     />
                 </header>
