@@ -2,7 +2,7 @@ import createEnumFunctions from '@/utils/createEnum'
 
 const FilesizeConstants = createEnumFunctions.createEnumNumberValue({
     BYTES_SIZE: 1024,
-    MAX_FILE_SIZE: 5 * 1024 * 1024
+    MAX_FILE_SIZE: 3.5 * 1024 * 1024
 }, 'filesizeconstants')
 
 const EnvironmentConstants = createEnumFunctions.createEnumStringValue({
