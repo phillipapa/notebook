@@ -6,7 +6,7 @@ import type { LoginState } from '@/configs/interfaces';
 export const SignInMenu = ({ onLogin, onLogout }: LoginState): JSX.Element => {
     const [user, setUser] = useState<{ name: string; email: string; } | null>(null);
 
-    const login = () => useGoogleLogin({
+    const login = useGoogleLogin({
         onSuccess: async (tokenResponse) => {
             const res = await fetch('/api/auth/google', {
                 method: 'POST',
@@ -38,7 +38,7 @@ export const SignInMenu = ({ onLogin, onLogout }: LoginState): JSX.Element => {
                 <button onClick={logout} className="bg-yellow-400 text-black font-semibold px-3 py-1 rounded">Sign out</button>
                 </>
             ) : (
-                <button onClick={login} className="bg-green-400 text-black font-semibold px-3 py-1 rounded">Sign in with Google</button>
+                <button onClick={(e) => { e.preventDefault(); login(); }} className="bg-green-400 text-black font-semibold px-3 py-1 rounded">Sign in with Google</button>
             )}
         </div>
     );
