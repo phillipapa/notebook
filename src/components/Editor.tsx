@@ -6,7 +6,7 @@ export const Editor: FC<{ value: string, onChange: (v: string) => void }> = ({ v
   const textareaRef = useRef<HTMLTextAreaElement>(null)
   const [previewList, setPreviewList] = useState<PreviewImage[]>([])
   const BYTES_SIZE: number = 1024
-  const MAX_FILE_SIZE: number = 5 * BYTES_SIZE * BYTES_SIZE
+  const MAX_FILE_SIZE: number = 3.5 * BYTES_SIZE * BYTES_SIZE
   const i = Math.floor(Math.log(MAX_FILE_SIZE) / Math.log(BYTES_SIZE))
   const sizeMegabytes: number | string = parseFloat((MAX_FILE_SIZE / Math.pow(BYTES_SIZE, i)).toFixed(2))
   const placeholderText: string = 'Tip: Write or drag image here (max 5 MB)'
