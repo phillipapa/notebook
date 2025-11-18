@@ -28,6 +28,12 @@ jobs:
             ${{ runner.os }}-npm-
       - name: Install dependencies
         run: npm ci
+      - name: Write env secrets
+        run: |
+          echo "$VITE_GOOGLE_OAUTH_CLIENTID" > .env
+          echo "" > .env
+        env:
+          VITE_GOOGLE_OAUTH_CLIENTID: ${{ secrets.VITE_GOOGLE_OAUTH_CLIENTID }}
       - name: Build
         run: npm run build
   go:
@@ -36,6 +42,25 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+      - name: Write Go env file
+        run: |
+          mkdir -p envs
+          echo "$HTTP_PORT" > envs/prod.env
+          echo "" > envs/prod.env
+          echo "$SUPABASE_URL" > envs/prod.env
+          echo "" > envs/prod.env
+          echo "$SUPABASE_PUB_KEY" > envs/prod.env
+          echo "" > envs/prod.env
+          echo "$SUPABASE_JWT_SECRET" > envs/prod.env
+          echo "" > envs/prod.env
+          echo "$GOOGLE_OAUTH_CLIENTID" > envs/prod.env
+          echo "" > envs/prod.env
+        env:
+          HTTP_PORT: ${{ vars.HTTP_PORT }}
+          SUPABASE_URL: ${{ secrets.SUPABASE_URL }}
+          SUPABASE_PUB_KEY: ${{ secrets.SUPABASE_PUB_KEY }}
+          SUPABASE_JWT_SECRET: ${{ secrets.SUPABASE_JWT_SECRET }}
+          GOOGLE_OAUTH_CLIENTID: ${{ secrets.GOOGLE_OAUTH_CLIENTID }}
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
