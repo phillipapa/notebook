@@ -2,7 +2,7 @@ import { type FC, useEffect, useState } from 'react'
 import { getLocalStorageSize } from '@/utils/storage'
 
 export const StorageLimitProgressBar: FC<{ current: string }> = ({ current }) => {
-    const MAX_FILE_SIZE = 3.5 * 1024 * 1024
+    const MAX_FILE_SIZE = 5 * 1024 * 1024
     const [size, setSize] = useState(() => getLocalStorageSize('notebook', current))
     const sizeInString = (size / 1024 / 1024).toFixed(2)
     const percent = Math.min((size / MAX_FILE_SIZE) * 100, 100)
