@@ -52,3 +52,7 @@ func CORSMiddleware() echo.MiddlewareFunc {
 		AllowHeaders: []string{echo.HeaderOrigin, echo.HeaderContentType, echo.HeaderAuthorization},
 	})
 }
+
+func BodyLimitMiddleware(limit string) echo.MiddlewareFunc {
+	return middleware.BodyLimit(limit)
+}

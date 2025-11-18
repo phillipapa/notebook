@@ -1,0 +1,36 @@
+import { useGoogleLogin } from '@react-oauth/google';
+import { type FC, useState } from 'react';
+import { createAlert } from '@/utils/createAlert';
+
+export const SignInMenu: FC<{}> = ({}) => {
+    const [user, setUser] = useState<{name:string; email:string; token:string} | null>(null);
+
+    const login = () => useGoogleLogin({
+        onSuccess: async (tokenResponse) => {
+            const res = await fetch('/api/auth/google', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(tokenResponse),
+            });
+            const data = await res.json();
+            setUser({ name: data.name, email: data.email, token: tokenResponse.access_token! });
+        },
+        onError: () => createAlert('Error', 'Login Failed, please try again', 'error'),
+        scope: 'https://www.googleapis.com/auth/drive.file',
+    });
+
+    const logout = () => setUser(null);
+
+    return (
+        <div className="flex items-center space-x-4">
+            {user ? (
+                <>
+                <span>{user.name}</span>
+                <button onClick={logout} className="text-sm text-red-400">Sign out</button>
+                </>
+            ) : (
+                <button onClick={login} className="bg-blue-400 text-white px-3 py-1 rounded">Sign in with Google</button>
+            )}
+        </div>
+    );
+}

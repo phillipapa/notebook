@@ -18,7 +18,12 @@ export default function App() {
             <div className="h-screen flex flex-col">
                 <header className="p-4 bg-gray-400  flex justify-between items-center">
                     <h1 className="text-xl font-bold"></h1>
-                    <Toolbar onReset={() => setText('')} previewRef={previewRef as React.RefObject<HTMLDivElement>} />
+                    <Toolbar
+                        onReset={() => setText('')}
+                        previewRef={previewRef as React.RefObject<HTMLDivElement>}
+                        token=''
+                        noteContent={text}
+                    />
                 </header>
                 <main className="flex flex-1 overflow-hidden">
                     <div className="w-1/2 h-full border-r p-4 justify-center items-center overflow-scroll">

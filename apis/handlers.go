@@ -1,34 +1,75 @@
 package main
 
 import (
-	"fmt"
+	"encoding/json"
 	"net/http"
+	"strings"
+	"time"
 
+	"github.com/joho/godotenv"
 	"github.com/labstack/echo/v4"
+	"golang.org/x/oauth2"
+	"google.golang.org/api/drive/v3"
+	"google.golang.org/api/idtoken"
+	"google.golang.org/api/option"
 )
 
-func GetNote(c echo.Context) error {
-	id := c.Param("id")
-	resp, err := supabaseRequest("GET", fmt.Sprintf("notes?id=eq.%s", id), nil)
-	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+type googleToken struct {
+	IDToken     string `json:"id_token"`
+	AccessToken string `json:"access_token"`
+}
+
+type noteRequest struct {
+	Content string `json:"content"`
+}
+
+func GoogleLogin(c echo.Context) error {
+	var gToken googleToken
+	envFile, _ := godotenv.Read("envs/prod.env")
+	clientIdSecret := envFile["GOOGLE_OAUTH_CLIENTID"]
+	if err := json.NewDecoder(c.Request().Body).Decode(&gToken); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid Payload"})
 	}
-	defer resp.Body.Close()
-	return c.Stream(resp.StatusCode, "application/json", resp.Body)
+
+	payload, err := idtoken.Validate(c.Request().Context(), gToken.IDToken, clientIdSecret)
+	if err != nil {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Invalid Token"})
+	}
+
+	resp := map[string]string{
+		"name":  payload.Claims["name"].(string),
+		"email": payload.Claims["email"].(string),
+	}
+	return c.JSON(http.StatusOK, resp)
 }
 
 func CreateNote(c echo.Context) error {
-	var note struct {
-		Title   string `json:"title"`
-		Content string `json:"content"`
+	auth := c.Request().Header.Get("Authorization")
+	if auth == "" || !strings.HasPrefix(auth, "Bearer ") {
+		return c.JSON(http.StatusUnauthorized, map[string]string{"error": "Unauthorized"})
 	}
-	if err := c.Bind(&note); err != nil {
-		return c.JSON(http.StatusBadRequest, echo.Map{"error": err.Error()})
+	accessToken := strings.TrimPrefix(auth, "Bearer ")
+
+	var nr noteRequest
+	if err := json.NewDecoder(c.Request().Body).Decode(&nr); err != nil {
+		return c.JSON(http.StatusBadRequest, map[string]string{"error": "Invalid Payload"})
 	}
-	resp, err := supabaseRequest("POST", "notes", note)
+
+	srv, err := drive.NewService(c.Request().Context(), option.WithTokenSource(
+		oauth2.StaticTokenSource(&oauth2.Token{AccessToken: accessToken}),
+	))
 	if err != nil {
-		return c.JSON(http.StatusInternalServerError, echo.Map{"error": err.Error()})
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error initializing google drive"})
 	}
-	defer resp.Body.Close()
-	return c.Stream(resp.StatusCode, "application/json", resp.Body)
+
+	file := &drive.File{
+		Name:     "notebook-note-" + time.Now().Format("20060102T150405") + ".json",
+		MimeType: "application/json",
+	}
+	_, err = srv.Files.Create(file).Media(strings.NewReader(nr.Content)).Do()
+	if err != nil {
+		return c.JSON(http.StatusInternalServerError, map[string]string{"error": "Error writing to google drive"})
+	}
+
+	return c.JSON(http.StatusOK, map[string]string{"fileId": file.Id})
 }

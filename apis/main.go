@@ -20,10 +20,11 @@ func main() {
 	e.Use(CORSMiddleware())
 	e.Use(JWTMiddleware())
 	e.Use(HeaderMiddleware())
+	e.Use(BodyLimitMiddleware("10M"))
 	e.Use(Headers)
 
-	e.GET("/notes/:id", GetNote)
-	e.POST("/notes", CreateNote)
+	e.POST("/api/auth/google", GoogleLogin)
+	e.POST("/api/notes", CreateNote)
 
 	port := envFile["HTTP_PORT"]
 	e.Logger.Fatal(e.Start(":" + port))
