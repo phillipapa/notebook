@@ -35,10 +35,10 @@ export const SignInMenu = ({ onLogin, onLogout }: LoginState): JSX.Element => {
             {user ? (
                 <>
                 <span>{user.name}</span>
-                <button onClick={logout} className="text-sm text-red-400">Sign out</button>
+                <button onClick={logout} className="bg-yellow-400 text-black font-semibold px-3 py-1 rounded">Sign out</button>
                 </>
             ) : (
-                <button onClick={login} className="bg-blue-400 text-white px-3 py-1 rounded">Sign in with Google</button>
+                <button onClick={login} className="bg-green-400 text-black font-semibold px-3 py-1 rounded">Sign in with Google</button>
             )}
         </div>
     );

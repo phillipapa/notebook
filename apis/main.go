@@ -27,5 +27,8 @@ func main() {
 	e.POST("/api/notes", CreateNote)
 
 	port := envFile["HTTP_PORT"]
-	e.Logger.Fatal(e.Start(":" + port))
+	log.Printf("Service started at port: %s", port)
+	if err := e.Start(":" + port); err != nil {
+		log.Fatal(err)
+	}
 }
